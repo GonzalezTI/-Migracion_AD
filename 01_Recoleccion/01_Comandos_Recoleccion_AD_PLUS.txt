@@ -1,0 +1,26 @@
+##########################################
+# NOTA: Todos los archivos generados estarán en C:\TEMP (crear si no existe)
+##########################################
+
+
+# 1. Listado de roles instalados en el servidor
+Get-WindowsFeature | Where-Object {$_.Installed -eq $true} > C:\TEMP\roles_instalados.txt
+
+# 2. Lista de servicios activos en el sistema
+sc query state= all > C:\TEMP\servicios_activos.txt
+
+# 3. Listado de procesos y su uso de CPU
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 20 | Out-File C:\TEMP\procesos_top.txt
+
+# 4. Espacio en disco de todas las unidades
+Get-PSDrive -PSProvider 'FileSystem' | Out-File C:\TEMP\espacio_disco.txt
+
+# 5. Adaptadores de red y direcciones IP
+Get-NetIPAddress | Out-File C:\TEMP\interfaces_red.txt
+
+# 6. Comprobación de conectividad DNS
+nslookup google.com > C:\TEMP\dns_test.txt
+
+# 7. Verificación de puertos en escucha (opcional avanzado)
+netstat -an | findstr LISTENING > C:\TEMP\puertos_escucha.txt
+

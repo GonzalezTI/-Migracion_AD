@@ -1,0 +1,61 @@
+
+##########################################
+# COMANDOS PARA RECOLECCIÓN DE INFORMACIÓN DE AD
+# Objetivo: Ser ejecutados por el encargado del servidor
+# Uso: Copiar y pegar en PowerShell o CMD con privilegios de Administrador
+##########################################
+
+##########################################
+# NOTA: Todos los archivos generados estarán en C:\TEMP (crear si no existe)
+##########################################
+
+# 1. Ver versión del sistema operativo
+systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+
+# 2. Ver nombre del dominio y servidor
+echo %COMPUTERNAME%
+echo %USERDOMAIN%
+
+# 3. Ver controladores de dominio
+nltest /dclist:tu_dominio.local
+
+# 4. Revisar roles FSMO
+netdom query fsmo
+
+# 5. Ver estado de replicación entre DCs
+repadmin /replsummary
+
+# 6. Diagnóstico general del controlador de dominio
+dcdiag /v > C:\TEMP\dcdiag_resultado.txt
+
+# 7. Exportar estructura básica de Active Directory
+dsquery user -limit 0 > C:\TEMP\usuarios_AD.txt
+dsquery computer -limit 0 > C:\TEMP\equipos_AD.txt
+
+# 8. Exportar GPOs aplicadas
+gpresult /h C:\TEMP\gpresult.html
+
+# 9. Revisar políticas de bloqueo y contraseñas
+secpol.msc (visual/manual)
+# O bien por PowerShell:
+Get-ADDefaultDomainPasswordPolicy | Out-File C:\TEMP\politicas_password.txt
+
+# 10. Listar cuentas con privilegios elevados
+net group "Domain Admins" /domain > C:\TEMP\admins_dominio.txt
+
+# 11. Ver protocolos inseguros (ej. SMBv1)
+Get-WindowsOptionalFeature -Online -FeatureName SMB1Protocol
+
+# 12. Sincronización de hora (NTP)
+w32tm /query /status > C:\TEMP\ntp_status.txt
+
+# 13. Configuración del Firewall
+netsh advfirewall show allprofiles > C:\TEMP\firewall_config.txt
+
+# 14. Ver últimos eventos de errores y advertencias del visor de eventos
+wevtutil qe System /q:"*[System[(Level=1 or Level=2)]]" /c:20 /f:text > C:\TEMP\eventos_error.txt
+
+# 15. Validar si hay respaldos configurados
+wbadmin get versions > C:\TEMP\respaldo_estado.txt
+
+
