@@ -7,6 +7,12 @@ Repositorio técnico para centralizar los comandos, scripts y documentación usa
 
 - **01_Recoleccion**: comandos utilizados para diagnóstico y análisis del entorno actual.
 - **02_Scripts**: scripts en PowerShell para exportar información útil.
+- **02_Seguridad**: Scripts para detectar riesgos y vulnerabilidades
+
+## Crear
+Crear carpetas:
+- C:\TEMP\
+- C:\TEMP\SeguridadAD
 
 ## 📅 Autor
 Roberto González — Consultor en Infraestructura Windows y Active Directory  
