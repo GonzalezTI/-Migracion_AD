@@ -8,15 +8,6 @@ Repositorio técnico para centralizar los comandos, scripts y documentación usa
 - **01_Recoleccion**: comandos utilizados para diagnóstico y análisis del entorno actual.
 - **02_Scripts**: scripts en PowerShell para exportar información útil.
 
-
-## 🧪 Tecnologías y herramientas
-
-- PowerShell
-- CMD (netdom, dcdiag, repadmin, etc.)
-- RSOP, GPMC
-- PingCastle / ADRecon
-- Windows Server 2012 R2 / 2022
-
 ## 📅 Autor
 Roberto González — Consultor en Infraestructura Windows y Active Directory  
 Versión del proyecto: 0.1 (en progreso)
