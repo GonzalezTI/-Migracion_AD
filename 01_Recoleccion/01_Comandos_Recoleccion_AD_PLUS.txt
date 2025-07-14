@@ -21,6 +21,6 @@ Get-NetIPAddress | Out-File C:\TEMP\interfaces_red.txt
 # 6. Comprobación de conectividad DNS
 nslookup google.com > C:\TEMP\dns_test.txt
 
-# 7. Verificación de puertos en escucha (opcional avanzado)
+# 7. Verificación de puertos en escucha 
 netstat -an | findstr LISTENING > C:\TEMP\puertos_escucha.txt
 
