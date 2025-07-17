@@ -1,0 +1,21 @@
+delegaciones inseguras
+
+Get-ADUser -Filter * -Properties TrustedForDelegation | Where-Object { $_.TrustedForDelegation -eq $true } | Format-Table Name, SamAccountName, TrustedForDelegation -AutoSize
+
+
+Get-ADComputer -Filter * -Properties TrustedToAuthForDelegation | Where-Object { $_.TrustedToAuthForDelegation -eq $true } | Format-Table Name, SamAccountName, TrustedToAuthForDelegation -AutoSize
+
+
+
+NOTAS: MANDAR LOS RESULTADO EN CAPTURA DE PANTALLA LOS DE DELGACION INSEGURAS
+
+GruposPrivelegiados
+
+Get-ADGroupMember "Administradores del dominio" |
+Export-Csv "C:\TEMP\SeguridadAD\DomainAdmins2.csv" -NoTypeInformation
+
+Get-ADGroupMember "Administradores de organización" |
+Export-Csv "C:\TEMP\SeguridadAD\EnterpriseAdmins2.csv" -NoTypeInformation
+
+Get-ADGroupMember "Replicador" |
+Export-Csv "C:\TEMP\SeguridadAD\Replicator2.csv" -NoTypeInformation
