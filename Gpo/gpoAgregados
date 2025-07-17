@@ -1,0 +1,59 @@
+# Script para la evaluación de servicios y protocolos inseguros en un entorno de Active Directory.
+# Este script se enfoca en identificar configuraciones que pueden ser explotadas.
+
+# --- Configuración de la carpeta de salida ---
+$OutputPath_Protocols = "C:\TEMP\SeguridadAD\AnalisisProtocolos"
+
+# Crea la carpeta si no existe
+If (-not (Test-Path $OutputPath_Protocols)) {
+    New-Item -Path $OutputPath_Protocols -ItemType Directory -Force
+    Write-Host "Carpeta de salida creada: $OutputPath_Protocols" -ForegroundColor Green
+}
+
+Write-Host "Iniciando el análisis de servicios y protocolos inseguros..." -ForegroundColor Yellow
+
+# --- 1. Identificación de Cuentas de Servicio con SPNs (riesgo de Kerberoasting) ---
+# Las cuentas con SPNs son objetivos comunes de ataques de Kerberoasting si tienen contraseñas débiles.
+Write-Host "Buscando cuentas de usuario con Service Principal Names (SPNs)..." -ForegroundColor Cyan
+Get-ADUser -Filter * -Properties ServicePrincipalName |
+Where-Object { $_.ServicePrincipalName -ne $null } |
+Select-Object SamAccountName, ServicePrincipalName, Enabled, PasswordLastSet |
+Export-Csv "$OutputPath_Protocols\ServiceAccountsWithSPNs_Users.csv" -NoTypeInformation -Encoding UTF8
+Write-Host "Usuarios con SPNs exportados a: $OutputPath_Protocols\ServiceAccountsWithSPNs_Users.csv" -ForegroundColor Green
+
+Write-Host "Buscando cuentas de equipo con Service Principal Names (SPNs)..." -ForegroundColor Cyan
+Get-ADComputer -Filter * -Properties ServicePrincipalName |
+Where-Object { $_.ServicePrincipalName -ne $null } |
+Select-Object Name, ServicePrincipalName, Enabled, LastLogonDate |
+Export-Csv "$OutputPath_Protocols\ServiceAccountsWithSPNs_Computers.csv" -NoTypeInformation -Encoding UTF8
+Write-Host "Equipos con SPNs exportados a: $OutputPath_Protocols\ServiceAccountsWithSPNs_Computers.csv" -ForegroundColor Green
+
+# --- 2. Generación de informes detallados de GPO para análisis de configuraciones de protocolo ---
+
+$GPO_Analysis_OutputPath = Join-Path $OutputPath_Protocols "GPO_Detailed_Security_Reports"
+If (-not (Test-Path $GPO_Analysis_OutputPath)) {
+    New-Item -Path $GPO_Analysis_OutputPath -ItemType Directory -Force
+    Write-Host "Carpeta para reportes detallados de GPOs creada: $GPO_Analysis_OutputPath" -ForegroundColor Green
+}
+
+Write-Host "Generando informes HTML detallados para todas las GPOs del dominio. Esto puede tardar..." -ForegroundColor Cyan
+$gpos = Get-GPO -All
+If ($gpos) {
+    ForEach ($gpo in $gpos) {
+        # Limpia el nombre de la GPO para usarlo como nombre de archivo (elimina caracteres no válidos)
+        $gpoName = $gpo.DisplayName -replace "[\\/:*?`"<>|]", ""
+        $reportPath = Join-Path $GPO_Analysis_OutputPath "$gpoName_SecurityReport.html"
+        Try {
+            $gpo | Get-GPOReport -ReportType Html -Path $reportPath
+            Write-Host "Reporte HTML para '$($gpo.DisplayName)' generado en: $reportPath" -ForegroundColor Green
+        }
+        Catch {
+            Write-Host "Error al generar el reporte HTML para '$($gpo.DisplayName)': $($_.Exception.Message)" -ForegroundColor Red
+        }
+    }
+    Write-Host "Informes HTML de GPOs generados. ¡Es CRÍTICO revisar estos archivos manualmente para configuraciones de protocolo y seguridad!" -ForegroundColor Yellow
+} Else {
+    Write-Host "No se encontraron GPOs en el dominio para analizar." -ForegroundColor Yellow
+}
+
+Write-Host "Análisis de servicios y protocolos finalizado. Revisa los archivos generados en '$OutputPath_Protocols'." -ForegroundColor Yellow
